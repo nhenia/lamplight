@@ -41,7 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.hereliesaz.lamplight.DiscoverCategory
+import com.hereliesaz.lamplight.HappyHour\nimport com.hereliesaz.lamplight.DiscoverCategory
 import com.hereliesaz.lamplight.LamplightViewModel
 import com.hereliesaz.lamplight.Place
 import com.hereliesaz.lamplight.PlacePhoto
@@ -178,7 +178,7 @@ private fun DiscoverCategoryResults(
                 Text(category.tagline, color = Cream, fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
         }
-        if (places.isEmpty()) {
+        if (category == DiscoverCategory.HAPPY_HOUR) {\n            HappyHourDirectory(vm.happyHours)\n        } else if (places.isEmpty()) {
             Text(
                 "Nothing tagged for this category yet.",
                 color = Fog,
@@ -224,6 +224,35 @@ private fun DiscoverPlaceCard(place: Place, vm: LamplightViewModel, open: (Place
         }
         Column(Modifier.padding(12.dp)) {
             Text(place.venue, color = Cream, fontSize = 16.sp, fontWeight = FontWeight.Black, maxLines = 2)
+        }
+    }
+}
+
+@Composable
+private fun HappyHourDirectory(hours: List<HappyHour>) {
+    if (hours.isEmpty()) {
+        Text("No happy-hour data available.", color = Fog, modifier = Modifier.padding(18.dp))
+        return
+    }
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        items(hours, key = { it.venue + "|" + it.neighborhood }) { hour ->
+            Column(Modifier.fillMaxWidth().background(Panel).padding(16.dp)) {
+                Text(hour.venue, color = Cream, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(hour.neighborhood + if (hour.address.isNotBlank()) " • " + hour.address else "", color = Fog, fontSize = 12.sp)
+                if (hour.daysAndHours.isNotBlank())
+                    Text(hour.daysAndHours, color = Cream, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp))
+                if (hour.drinks.isNotBlank())
+                    Text("Drinks: " + hour.drinks, color = Cream, fontSize = 13.sp, modifier = Modifier.padding(top = 7.dp))
+                if (hour.food.isNotBlank())
+                    Text("Food: " + hour.food, color = Cream, fontSize = 13.sp, modifier = Modifier.padding(top = 7.dp))
+                if (hour.restrictions.isNotBlank())
+                    Text("Restrictions: " + hour.restrictions, color = Fog, fontSize = 12.sp, modifier = Modifier.padding(top = 7.dp))
+                Text("Research: " + hour.researchDate + " • " + hour.verification, color = Fog,
+                    fontSize = 11.sp, modifier = Modifier.padding(top = 7.dp))
+            }
         }
     }
 }

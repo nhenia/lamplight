@@ -25,7 +25,7 @@ jobs:
         run: python3 scripts/update_happy_hours.py
       - name: Commit monitoring data
         run: |
-          if ! git diff --quiet -- data/happy-hours; then
+          git add data/happy-hours/\n          if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add data/happy-hours/

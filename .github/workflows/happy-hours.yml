@@ -1,0 +1,40 @@
+name: Happy hour source monitor
+on:
+  schedule:
+    # 13:00 UTC is 7/8 AM Central depending on daylight saving time.
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: happy-hour-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan sources and save findings
+        run: python3 scripts/update_happy_hours.py
+      - name: Commit monitoring data
+        run: |
+          if ! git diff --quiet -- data/happy-hours; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add data/happy-hours/
+            git commit -m "Monitor happy hour source changes"
+            git push
+          fi
+      - name: Upload review report
+        uses: actions/upload-artifact@v4
+        with:
+          name: happy-hour-review
+          path: data/happy-hours/review.md
+          retention-days: 30

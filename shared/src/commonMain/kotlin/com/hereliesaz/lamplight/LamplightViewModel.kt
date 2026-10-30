@@ -31,7 +31,7 @@ class LamplightViewModel(private val settingsStore: SettingsStore) : ViewModel()
     // in setCurrentLocation) don't need their own loading-state handling; the one real
     // consequence is a location fix that arrives before this finishes won't have hotels to
     // match against yet, same as it having no fix at all.
-    private val catalogState = mutableStateOf<Catalog?>(null)
+    private val catalogState = mutableStateOf<Catalog?>(null)\n    private val happyHourState = mutableStateOf<List<HappyHour>>(emptyList())\n    val happyHours: List<HappyHour> get() = happyHourState.value
     private val hotelAnchorState = mutableStateOf(loadHotelAnchor())
     private val hotelPromptAnsweredState = mutableStateOf(
         hotelAnchorState.value != null || settingsStore.getBoolean(KEY_HOTEL_SKIPPED)

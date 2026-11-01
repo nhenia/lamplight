@@ -51,12 +51,18 @@ jobs:
           GITHUB_REPOSITORY: '${{ github.repository }}'
         run: |-
           echo '🔍 Finding unlabeled open issues...'
+          if [ "$(gh api "repos/${GITHUB_REPOSITORY}" --jq '.has_issues')" != 'true' ]; then
+            echo 'GitHub Issues are disabled; nothing to triage.'
+            echo 'issues_to_triage=[]' >> "${GITHUB_OUTPUT}"
+            echo 'has_issues=false' >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
           ISSUES="$(gh issue list \
             --state 'open' \
             --search 'no:label' \
             --json number,title,body \
             --limit '20' \
-            --repo "${GITHUB_REPOSITORY}"
+            --repo "${GITHUB_REPOSITORY}" | jq -c .
           )"
           ISSUE_COUNT="$(echo "${ISSUES}" | jq 'length')"
           echo "Found ${ISSUE_COUNT} unlabeled issue(s)."
